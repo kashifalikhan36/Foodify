@@ -1,0 +1,1 @@
+uvicorn main:app --host 0.0.0.0 --port 443 --ssl-certfile c:\Users\BlessAi\Documents\GitHub\Bless-AI-Server\file.withkey.pem                                       
