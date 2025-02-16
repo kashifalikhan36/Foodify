@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Food AI Recipe Generator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f4f4f9;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      label {
+        display: block;
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #218838;
+      }
+
+      .recipe-steps {
+        margin-top: 20px;
+      }
+
+      .step {
+        margin-bottom: 10px;
+        font-size: 18px;
+        padding: 10px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Food AI Recipe Generator</h1>
+
+      <label for="prompt">Enter a food dish (e.g., Pizza, Pasta, etc.):</label>
+      <input type="text" id="prompt" placeholder="Enter your dish here" />
+
+      <button onclick="generateRecipe()">Generate Recipe</button>
+
+      <div class="recipe-steps" id="recipe-steps">
+        <!-- The generated recipe steps will be displayed here -->
+      </div>
+    </div>
+
+    <script>
+      // Function to make an API call to your local server and get recipe steps
+      async function generateRecipe() {
+        const prompt = document.getElementById("prompt").value;
+        const recipeStepsContainer = document.getElementById("recipe-steps");
+        recipeStepsContainer.innerHTML = ""; // Clear previous recipe steps
+
+        if (!prompt) {
+          alert("Please enter a prompt!");
+          return;
+        }
+
+        try {
+          const response = await fetch("http://127.0.0.1:8000/foodify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text: prompt }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Error: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+
+          if (data && data.response_text) {
+            // Display recipe steps
+            const steps = data.response_text.split("\n");
+            steps.forEach((step) => {
+              const stepDiv = document.createElement("div");
+              stepDiv.classList.add("step");
+              stepDiv.innerText = step;
+              recipeStepsContainer.appendChild(stepDiv);
+            });
+          } else {
+            recipeStepsContainer.innerHTML = "No recipe steps found.";
+          }
+        } catch (error) {
+          console.error("Error generating recipe:", error);
+          recipeStepsContainer.innerHTML =
+            "An error occurred while generating the recipe.";
+        }
+      }
+    </script>
+  </body>
+</html>
